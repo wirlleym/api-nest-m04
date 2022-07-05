@@ -1,16 +1,21 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entity/users.entity';
 import * as bcrypt from 'bcryptjs';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { handleErrorConstraintUnique } from 'src/utils/handle-error-unique.util';
 
 @Injectable()
 export class UsersService {
+  private userSelect = {
+    id: true,
+    name: true,
+    email: true,
+    updatedAt: true,
+    createdAt: true,
+  };
+
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateUserDto): Promise<User | void> {
@@ -23,17 +28,18 @@ export class UsersService {
     };
 
     return this.prisma.user
-      .create({ data })
-      .catch(this.handleErrorConstraintUnique);
+      .create({ data, select: this.userSelect })
+      .catch(handleErrorConstraintUnique);
   }
 
   findAll(): Promise<User[]> {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({ select: this.userSelect });
   }
 
   async verifyIdAndReturnUser(id: string): Promise<User> {
     const user: User = await this.prisma.user.findUnique({
       where: { id },
+      select: this.userSelect,
     });
 
     if (!user) {
@@ -41,16 +47,6 @@ export class UsersService {
     }
 
     return user;
-  }
-
-  handleErrorConstraintUnique(error: Error): never {
-    const splitedMessage = error.message.split('`');
-
-    const errorMessage = `Entrada '${
-      splitedMessage[splitedMessage.length - 2]
-    }' não está respeitando a constraint UNIQUE`;
-
-    throw new UnprocessableEntityException(errorMessage);
   }
 
   findOne(id: string): Promise<User> {
@@ -61,8 +57,8 @@ export class UsersService {
     await this.verifyIdAndReturnUser(id);
 
     return this.prisma.user
-      .update({ where: { id }, data: dto })
-      .catch(this.handleErrorConstraintUnique);
+      .update({ where: { id }, data: dto, select: this.userSelect })
+      .catch(handleErrorConstraintUnique);
   }
 
   async remove(id: string) {
@@ -70,7 +66,7 @@ export class UsersService {
 
     return this.prisma.user.delete({
       where: { id },
-      select: { name: true, email: true },
+      select: this.userSelect,
     });
   }
 }

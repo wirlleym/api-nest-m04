@@ -26,6 +26,12 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Clone repository
+
+```bash
+$ git clone https://https://github.com/wirlleym/api-nest-m04
+```
+
 ## Installation
 
 ```bash
