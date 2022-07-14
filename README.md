@@ -29,7 +29,7 @@
 ## Clone repository
 
 ```bash
-$ git clone https://https://github.com/wirlleym/api-nest-m04
+$ git clone https://github.com/wirlleym/api-nest-m04
 ```
 
 ## Installation
