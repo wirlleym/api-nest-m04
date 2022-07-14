@@ -17,8 +17,8 @@ model User {
   password String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  favorites Favorite[]
   orders Order[]
+  favorites Favorite[]
   @@map("user")
 }
 
@@ -32,8 +32,8 @@ model Product {
   updatedAt DateTime @updatedAt @map("updated_at")
   category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   categoryId String? @map("category_id")
-  favorites Favorite[]
   orders OrderToProduct[]
+  favorites Favorite[]
   @@map("product")
 }
 
@@ -53,17 +53,6 @@ model Category {
   updatedAt DateTime @updatedAt @map("updated_at")
   products Product[]
   @@map("category")
-}
-
-model Favorite {
-  id String @id @default(uuid())
-  createdAt DateTime @default(now()) @map("created_at")
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @map("user_id")
-  product Product @relation(fields: [productName], references: [name], onDelete: Cascade)
-  productName String @map("product_name")
-  @@map("favorite")
-  @@unique([userId, productName])
 }
 
 model Order {
@@ -86,4 +75,15 @@ model OrderToProduct {
   orderId String? @map("order_id")
   quantity Int
   @@map("order_to_product")
+}
+
+model Favorite {
+  id String @id @default(uuid())
+  favoritedAt DateTime @default(now()) @map("favorited_at")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+  product Product @relation(fields: [productName], references: [name], onDelete: Cascade)
+  productName String @map("product_name")
+  @@map("favorite")
+  @@unique([userId, productName])
 }
