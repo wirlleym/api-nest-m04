@@ -11,9 +11,8 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: true,
   });
-
-  app.set('trust proxy', 1);  // configurar para https  (Deploy)
-
+  // configurar para https  (Deploy)
+  app.set('trust proxy', 1);
 
   app.useGlobalPipes(new ValidationPipe());
 
