@@ -2,9 +2,18 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // const app = await NestFactory.create(AppModule);  (Sem Deploy)
+
+  // Tipar com NestExpressApplication para funcionar o https (Deploy)
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    cors: true,
+  });
+
+  app.set('trust proxy', 1);  // configurar para https  (Deploy)
+
 
   app.useGlobalPipes(new ValidationPipe());
 
@@ -25,6 +34,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(3333);
+  // await app.listen(3333);  (Sem Deploy)
+  await app.listen(process.env.PORT || 3333);
 }
 bootstrap();
